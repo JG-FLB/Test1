@@ -71,6 +71,7 @@ class TaskStore:
                 f"Could not read tasks from {self.path}: invalid JSON. "
                 "Delete or fix the file and try again."
             ) from exc
+        data = json.loads(self.path.read_text())
         return [Task.from_dict(item) for item in data]
 
     def save(self, tasks: List[Task]) -> None:
@@ -229,6 +230,7 @@ def main() -> None:
     except ValueError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         sys.exit(1)
+    handler(args, planner)
 
 
 if __name__ == "__main__":
