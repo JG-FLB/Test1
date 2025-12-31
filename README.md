@@ -20,6 +20,11 @@ python revit_task_planner.py list
 
 Open tasks are shown first; completed tasks move to the bottom with a ✅ icon. Overdue items with a due date highlight at the top of the list. Data is stored in `revit_tasks.json` in this directory so the list persists between runs. If you want to start fresh, delete that file (`rm revit_tasks.json`).
 
+If you run into issues:
+
+- Blank titles are rejected to keep the list readable. Provide a short description for each task.
+- If `revit_tasks.json` gets corrupted (e.g., you edited it manually), the CLI will explain what went wrong and prompt you to fix or delete the file.
+
 ### More examples
 
 ```bash

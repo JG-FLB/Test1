@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from datetime import date, datetime
@@ -63,6 +64,13 @@ class TaskStore:
     def load(self) -> List[Task]:
         if not self.path.exists():
             return []
+        try:
+            data = json.loads(self.path.read_text())
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"Could not read tasks from {self.path}: invalid JSON. "
+                "Delete or fix the file and try again."
+            ) from exc
         data = json.loads(self.path.read_text())
         return [Task.from_dict(item) for item in data]
 
@@ -75,6 +83,8 @@ class TaskPlanner:
         self.store = store
 
     def add(self, title: str, priority: int, due_date: str | None) -> Task:
+        if not title.strip():
+            raise ValueError("Title cannot be empty")
         tasks = self.store.load()
         next_id = 1 if not tasks else max(task.task_id for task in tasks) + 1
         task = Task(task_id=next_id, title=title, priority=priority, due_date=due_date)
@@ -215,6 +225,11 @@ def main() -> None:
     }
 
     handler = handlers[args.command]
+    try:
+        handler(args, planner)
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
     handler(args, planner)
 
 
